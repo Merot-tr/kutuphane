@@ -1,3 +1,0 @@
-mehmet_admin|12345|Admin
-ayse_mudur|qwerty|Mudur
-ali_uye|98765|Uye

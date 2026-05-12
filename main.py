@@ -1,84 +1,89 @@
-class Kullanici:
-    def __init__(self, kullanici_adi, sifre, yetki="Uye"):
-        self.kullanici_adi = kullanici_adi
-        self.sifre = sifre  
-        self.yetki = yetki
+import os
+import sys
+import kitap_guncelleme as kg
+import kullanici_girisi_ve_yetkilendirme as ky
 
-    def __str__(self):
-        return f"{self.kullanici_adi}|{self.sifre}|{self.yetki}"
+def menuyu_goster(kullanici):
+    print(f"\n--- {kullanici.ad_soyad.upper()} ({kullanici.rol}) ---")
+    print("1. Kitapları Listele (Sıralı)")
+    print("2. Kitap Ara (İsim/ISBN)")
+    print("3. Kitap Kirala")
+    print("4. Kitap İade Et")
+    
+    # Hiyerarşik Yetki Kontrolü
+    if ky.yetki_var_mi(kullanici, "personel"):
+        print("5. Yeni Kitap Ekle")
+        print("6. Stok Güncelle")
+    
+    if ky.yetki_var_mi(kullanici, "yonetici"):
+        print("7. Kullanıcı Yönetimi (Admin Paneli)")
+    
+    print("0. Çıkış")
+    return input("Seçiminiz: ")
 
-class Admin(Kullanici):
-    def __init__(self, kullanici_adi, sifre):
-        super().__init__(kullanici_adi, sifre, yetki="Admin")
+def kitaplari_sirali_listele():
+    kitaplar = kg.kitaplari_yukle()
+    if not kitaplar:
+        print("Kütüphanede kitap bulunamadı.")
+        return
+    
+    print("\n--- Kitap Listesi (A-Z) ---")
+    # Kitap ismine göre alfabetik sıralama
+    sirali = sorted(kitaplar, key=lambda x: x.ad)
+    for k in sirali:
+        durum = "MEVCUT" if k.stok > 0 else "TÜKENDİ"
+        print(f"[{k.isbn}] {k.ad} - {k.yazar} | Stok: {k.stok} | Durum: {durum}")
 
-class Mudur(Kullanici):
-    def __init__(self, kullanici_adi, sifre):
-        super().__init__(kullanici_adi, sifre, yetki="Mudur")
-
-class Kitap:
-    def __init__(self, kitap_adi, yazar, isbn, durum="Mevcut", kiralayan="Yok"):
-        self.kitap_adi = kitap_adi
-        self.yazar = yazar
-        self.isbn = isbn
-        self.durum = durum  
-        self.kiralayan = kiralayan
-
-    def __str__(self):
-        return f"{self.kitap_adi}|{self.yazar}|{self.isbn}|{self.durum}|{self.kiralayan}"        
-
-kullanicilar = [
-    Admin("mehmet_admin", "12345"),
-    Mudur("ayse_mudur", "qwerty"),
-    Kullanici("ali_uye", "98765")
-]
-
-
-kitaplar = [
-    Kitap("Sefiller", "Victor Hugo", "978123"),
-    Kitap("Suç ve Ceza", "Dostoyevski", "978456"),
-    Kitap("Python Programlama", "M. Elkoca", "978789", durum="Kirada", kiralayan="ali_uye")
-]
-
-
-def verileri_kaydet(dosya_adi, veri_listesi):
-    with open(dosya_adi, "w", encoding="utf-8") as f:
-        for veri in veri_listesi:
-            f.write(str(veri) + "\n")
-
-
-verileri_kaydet("kullanicilar.txt", kullanicilar)
-verileri_kaydet("kitaplar.txt", kitaplar)
-
-
-kullanici = input("Kullanıcı adınızı girin: ")
-sifre = input("Şifrenizi girin: ")
-sifre_kontrol = False
-for k in kullanicilar:
-    if k.kullanici_adi == kullanici and k.sifre == sifre:
-        print(f"Hoş geldiniz, {k.kullanici_adi}!")
-        sifre_kontrol = True
-        break
-
-if sifre_kontrol == False:
-    print("Hatalı kullanıcı adı veya şifre!")
-
-kitap = input("Kiralamak istediğiniz kitabın ISBN numarasını girin: ")
-
-
-def kirala(kullanici_adi, isbn):
-    for kitap in kitaplar:
-        if kitap.isbn == isbn:
-            if kitap.durum == "Mevcut":
-                kitap.durum = "Kirada"
-                kitap.kiralayan = kullanici_adi
-                print(f"{kitap.kitap_adi} kitabı {kullanici_adi} tarafından kiralandı.")
-                file = open("kitaplar.txt", "w", encoding="utf-8")
-                for k in kitaplar:
-                    file.write(str(k) + "\n")
-                    file.close()
+def kitap_kirala(kullanici):
+    isbn = input("Kiralamak istediğiniz kitabın ISBN numarası: ")
+    kitaplar = kg.kitaplari_yukle()
+    
+    for k in kitaplar:
+        if k.isbn == isbn:
+            if k.stok > 0:
+                k.stok -= 1
+                kg.kitaplari_kaydet(kitaplar)
+                print(f"✓ {k.ad} başarıyla kiralandı. Kalan stok: {k.stok}")
+                # Log tutma işlemi buraya eklenebilir
                 return
             else:
-                print(f"{kitap.kitap_adi} kitabı şu anda kirada.")
+                print("✗ Üzgünüz, bu kitabın stoğu tükenmiş.")
                 return
-    print("Kitap bulunamadı.")
+    print("✗ Kitap bulunamadı.")
 
+def kitap_iade(kullanici):
+    isbn = input("İade etmek istediğiniz kitabın ISBN numarası: ")
+    kitaplar = kg.kitaplari_yukle()
+    
+    for k in kitaplar:
+        if k.isbn == isbn:
+            k.stok += 1
+            kg.kitaplari_kaydet(kitaplar)
+            print(f"✓ {k.ad} iade alındı. Yeni stok: {k.stok}")
+            return
+    print("✗ Geçersiz ISBN.")
+
+def ana_dongu():
+    ky.sistem_hazirla()
+    aktif_kullanici = ky.giris_yap()
+    
+    if not aktif_kullanici:
+        return
+
+    while True:
+        secim = menuyu_goster(aktif_kullanici)
+        
+        if secim == "1":
+            kitaplari_sirali_listele()
+        elif secim == "3":
+            kitap_kirala(aktif_kullanici)
+        elif secim == "4":
+            kitap_iade(aktif_kullanici)
+        elif secim == "0":
+            print("Güle güle!")
+            break
+        else:
+            print("Bu özellik henüz geliştirme aşamasında veya yetkiniz yok.")
+
+if __name__ == "__main__":
+    ana_dongu()

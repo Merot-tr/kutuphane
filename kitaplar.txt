@@ -1,3 +1,0 @@
-Sefiller|Victor Hugo|978123|Mevcut|Yok
-Suç ve Ceza|Dostoyevski|978456|Mevcut|Yok
-Python Programlama|M. Elkoca|978789|Kirada|ali_uye

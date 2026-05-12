@@ -13,7 +13,7 @@ class Kitap:#Kitap Bilgilerini tutan sınıf
     stok: int           
     konum: str          
 #Dosya işlemleri
-    DOSYA = os.path.join("veri", "kitaplar.json")#Kitap bilgilerini tutan dosyanın yolu pc hangi işletim sistemini kullanırsa kullansın doğru şekilde oluşturulmasını sağlar
+DOSYA = os.path.join("veri", "kitaplar.json")#Kitap bilgilerini tutan dosyanın yolu pc hangi işletim sistemini kullanırsa kullansın doğru şekilde oluşturulmasını sağlar
 
 def kitaplari_yukle() -> List[Kitap]:
     if not os.path.exists(DOSYA):#Dosya yoksa boş liste döndürür, böylece program ilk kez çalıştırıldığında hata olmaz
