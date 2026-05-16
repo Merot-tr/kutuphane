@@ -1,34 +1,10 @@
 import os
-import json
-from dataclasses import dataclass, asdict
-from typing import List
-
-# IP1'deki Kullanici ve fonksiyonları buraya kopyala
-@dataclass
-class Kullanici:
-    kullanici_adi: str
-    sifre_hash: str
-    rol: str
-    ad_soyad: str
-    ogrenci_no: str = ""
-
-import hashlib
-DOSYA = os.path.join("veri", "kullanicilar.json")#veriyi klasöründe kullanicilar.json dosyasını oluşturur
-
-def kullanicilari_yukle():
-    if not os.path.exists(DOSYA):#dosya yoksa boş liste döndürür
-        return []
-    with open(DOSYA, "r", encoding="utf-8") as f:
-        veri = json.load(f)#json dosyasındaki veriyi okuyup python listesine çevirir
-    return [Kullanici(**u) for u in veri]#sözlük verilerini kullanıcı nesnesine çevirir
-
-def kullanicilari_kaydet(liste):
-    with open(DOSYA, "w", encoding="utf-8") as f:#kullanıcı listesini json dosyasına kaydeder
-        json.dump([asdict(u) for u in liste], f,
-                  ensure_ascii=False, indent=2)
-#Kullanıcı oluşturma fonksiyonu
-def sifrele(sifre: str) -> str:
-    return hashlib.sha256(sifre.encode("utf-8")).hexdigest()
+from kullanici_girisi_ve_yetkilendirme import (
+    Kullanici,
+    kullanicilari_yukle,
+    kullanicilari_kaydet,
+    sifrele,
+)
 def kullanici_olustur():
     print("\n--- Kullanıcı Oluştur ---")
     kullanicilar = kullanicilari_yukle()
@@ -81,6 +57,16 @@ def kullanici_sil(aktif_kullanici):
 
     kullanicilari_kaydet(yeni_liste)
     print(f"✓ '{k_adi}' silindi.")
+#Kullanıcıları listeleme fonksiyonu
+def kullanicilari_listele():
+    kullanicilar = kullanicilari_yukle()
+    if not kullanicilar:
+        print("Kayıtlı kullanıcı yok.")
+        return
+    print(f"{'Kullanıcı Adı':<20} {'Ad Soyad':<25} {'Rol':<12} {'Öğrenci No'}")
+    print("-" * 70)
+    for u in kullanicilar:
+        print(f"{u.kullanici_adi:<20} {u.ad_soyad:<25} {u.rol:<12} {u.ogrenci_no}")
 if __name__ == "__main__":
     os.makedirs("veri", exist_ok=True)
 
