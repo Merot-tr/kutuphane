@@ -1,84 +1,105 @@
 import os
 import sys
 import kitap_guncelleme as kg
-import kullanici_girisi_ve_yetkilendirme as ky
+import kullanici_girisi_ve_yetkilendirme as kgy
+import kullanici_hesap_yonetimi as khy
+import kitap_arama_listeleme as kal
+import Odunc_alma as oa
+import raporlama as rp
 
 def menuyu_goster(kullanici):
     print(f"\n--- {kullanici.ad_soyad.upper()} ({kullanici.rol}) ---")
     print("1. Kitapları Listele (Sıralı)")
     print("2. Kitap Ara (İsim/ISBN)")
-    print("3. Kitap Kirala")
+    print("3. Kitap Ödünç Al")
     print("4. Kitap İade Et")
     
-    # Hiyerarşik Yetki Kontrolü
-    if ky.yetki_var_mi(kullanici, "personel"):
+    # Personel ve Üstü Yetkiler
+    if kgy.yetki_var_mi(kullanici, "personel"):
         print("5. Yeni Kitap Ekle")
         print("6. Stok Güncelle")
+        print("7. İstatistik ve Raporlama Paneli")
     
-    if ky.yetki_var_mi(kullanici, "yonetici"):
-        print("7. Kullanıcı Yönetimi (Admin Paneli)")
+    # Sadece Yönetici Yetkisi
+    if kgy.yetki_var_mi(kullanici, "yonetici"):
+        print("8. Kullanıcı Yönetim Paneli")
     
     print("0. Çıkış")
-    return input("Seçiminiz: ")
+    return input("Seçiminiz: ").strip()
 
-def kitaplari_sirali_listele():
-    kitaplar = kg.kitaplari_yukle()
-    if not kitaplar:
-        print("Kütüphanede kitap bulunamadı.")
-        return
-    
-    print("\n--- Kitap Listesi (A-Z) ---")
-    # Kitap ismine göre alfabetik sıralama
-    sirali = sorted(kitaplar, key=lambda x: x.ad)
-    for k in sirali:
-        durum = "MEVCUT" if k.stok > 0 else "TÜKENDİ"
-        print(f"[{k.isbn}] {k.ad} - {k.yazar} | Stok: {k.stok} | Durum: {durum}")
+def alt_menü_kullanici_yonetimi(aktif_kullanici):
+    while True:
+        print("\n--- Kullanıcı Yönetim Paneli ---")
+        print("1. Kullanıcı Oluştur")
+        print("2. Kullanıcı Sil")
+        print("3. Kullanıcıları Listele")
+        print("0. Ana Menüye Dön")
+        secim = input("Seçiminiz: ").strip()
 
-def kitap_kirala(kullanici):
-    isbn = input("Kiralamak istediğiniz kitabın ISBN numarası: ")
-    kitaplar = kg.kitaplari_yukle()
-    
-    for k in kitaplar:
-        if k.isbn == isbn:
-            if k.stok > 0:
-                k.stok -= 1
-                kg.kitaplari_kaydet(kitaplar)
-                print(f"✓ {k.ad} başarıyla kiralandı. Kalan stok: {k.stok}")
-                # Log tutma işlemi buraya eklenebilir
-                return
-            else:
-                print("✗ Üzgünüz, bu kitabın stoğu tükenmiş.")
-                return
-    print("✗ Kitap bulunamadı.")
+        if secim == "1":
+            khy.kullanici_olustur()
+        elif secim == "2":
+            khy.kullanici_sil(aktif_kullanici)
+        elif secim == "3":
+            khy.kullanicilari_listele()
+        elif secim == "0":
+            break
+        else:
+            print("Geçersiz seçim.")
 
-def kitap_iade(kullanici):
-    isbn = input("İade etmek istediğiniz kitabın ISBN numarası: ")
-    kitaplar = kg.kitaplari_yukle()
-    
-    for k in kitaplar:
-        if k.isbn == isbn:
-            k.stok += 1
-            kg.kitaplari_kaydet(kitaplar)
-            print(f"✓ {k.ad} iade alındı. Yeni stok: {k.stok}")
-            return
-    print("✗ Geçersiz ISBN.")
+def alt_menü_raporlama():
+    while True:
+        print("\n--- İstatistik ve Raporlama Paneli ---")
+        print("1. Envanter Özeti")
+        print("2. Popüler Kitaplar")
+        print("3. Gecikmiş İadeler")
+        print("4. Tam Rapor Çıkar")
+        print("0. Ana Menüye Dön")
+        secim = input("Seçiminiz: ").strip()
+
+        if secim == "1":
+            rp.envanter_ozeti()
+        elif secim == "2":
+            rp.populer_kitaplar()
+        elif secim == "3":
+            rp.gecikmis_iadeler()
+        elif secim == "4":
+            rp.tam_rapor()
+        elif secim == "0":
+            break
+        else:
+            print("Geçersiz seçim.")
 
 def ana_dongu():
-    ky.sistem_hazirla()
-    aktif_kullanici = ky.giris_yap()
+    kgy.sistem_hazirla()
+    aktif_kullanici = kgy.giris_yap()
     
     if not aktif_kullanici:
         return
+
+    # Odunc_alma.py dosyasındaki '.adi' hatasını dinamik olarak düzeltiyoruz
+    # Böylece harici dosyayı değiştirmek zorunda kalmazsınız.
+    aktif_kullanici.adi = aktif_kullanici.kullanici_adi
 
     while True:
         secim = menuyu_goster(aktif_kullanici)
         
         if secim == "1":
-            kitaplari_sirali_listele()
+            kal.kitaplari_listele()
+        elif secim == "2":
+            kal.kitap_ara()
         elif secim == "3":
-            kitap_kirala(aktif_kullanici)
+            oa.odunc_al(aktif_kullanici)
         elif secim == "4":
-            kitap_iade(aktif_kullanici)
+            oa.iade_et(aktif_kullanici)
+        elif secim == "5" and kgy.yetki_var_mi(aktif_kullanici, "personel"):
+            kg.kitap_ekle()
+        elif secim == "6" and kgy.yetki_var_mi(aktif_kullanici, "personel"):
+            kg.stok_guncelle()
+        elif secim == "7" and kgy.yetki_var_mi(aktif_kullanici, "personel"):
+            alt_menü_raporlama()
+        elif secim == "8" and kgy.yetki_var_mi(aktif_kullanici, "yonetici"):
+            alt_menü_kullanici_yonetimi(aktif_kullanici)
         elif secim == "0":
             print("Güle güle!")
             break

@@ -12,5 +12,12 @@
     "rol": "ogrenci",
     "ad_soyad": "naznaz",
     "ogrenci_no": "345"
+  },
+  {
+    "kullanici_adi": "a",
+    "sifre_hash": "ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb",
+    "rol": "yonetici",
+    "ad_soyad": "a",
+    "ogrenci_no": ""
   }
 ]

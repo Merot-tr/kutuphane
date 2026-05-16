@@ -45,10 +45,10 @@ def kitap_stok_guncelle(isbn, miktar):
     with open(KITAP_DOSYA, "w", encoding="utf-8") as f:
         json.dump(kitaplar, f, ensure_ascii=False, indent=2)
 
-def odunc_al():
+def odunc_al(kullanici):
     print("\n--- Kitap Ödünç Al ---")
     isbn = input("ISBN: ").strip()
-    kullanici = input("Kullanıcı Adı: ").strip()
+    kullanici_adi = kullanici.adi  # veya kullanici.kullanici_adi
 
     # Stok kontrolü
     if not os.path.exists(KITAP_DOSYA):
@@ -67,7 +67,7 @@ def odunc_al():
     # Zaten ödünçte mi?
     oduncler = oduncleri_yukle()
     for o in oduncler:
-        if o.isbn == isbn and o.kullanici_adi == kullanici and not o.geri_donus_tarihi:
+        if o.isbn == isbn and o.kullanici_adi == kullanici_adi and not o.geri_donus_tarihi:
             print("✗ Bu kitap zaten bu kullanıcıda!")
             return
 
@@ -77,7 +77,7 @@ def odunc_al():
     kayit = OduncKaydi(
         kayit_id=kayit_id_olustur(),
         isbn=isbn,
-        kullanici_adi=kullanici,
+        kullanici_adi=kullanici_adi,
         odunc_tarihi=str(bugun),
         iade_tarihi=str(iade),
         geri_donus_tarihi=""
@@ -87,7 +87,7 @@ def odunc_al():
     kitap_stok_guncelle(isbn, -1)  # stok 1 azalt
     print(f"✓ Ödünç alındı! İade tarihi: {iade} | Kayıt ID: {kayit.kayit_id}")
 
-def iade_et():
+def iade_et(kullanici):
     print("\n--- Kitap İade Et ---")
     kayit_id = input("Kayıt ID: ").strip().upper()
     oduncler = oduncleri_yukle()

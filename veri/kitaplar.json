@@ -43,5 +43,14 @@
     "yayin_yili": 1988,
     "stok": 7,
     "konum": "A-3"
+  },
+  {
+    "isbn": "00101",
+    "ad": "Deneme",
+    "yazar": "Deneme",
+    "yayinevi": "Deneme",
+    "yayin_yili": 212,
+    "stok": 2,
+    "konum": "a2"
   }
 ]
