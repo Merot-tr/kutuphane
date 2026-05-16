@@ -1,0 +1,122 @@
+import os
+import json
+import datetime
+from dataclasses import dataclass
+from typing import List
+from collections import Counter
+
+@dataclass
+class Kitap:
+    isbn: str
+    ad: str
+    yazar: str
+    yayinevi: str
+    yayin_yili: int
+    stok: int
+    konum: str
+
+@dataclass
+class OduncKaydi:
+    kayit_id: str
+    isbn: str
+    kullanici_adi: str
+    odunc_tarihi: str
+    iade_tarihi: str
+    geri_donus_tarihi: str
+
+KITAP_DOSYA = os.path.join("veri", "kitaplar.json")#kitap bilgilerini tutan dosyanın yolu
+ODUNC_DOSYA = os.path.join("veri", "odunc_kayitlari.json")#ödünç kayıtlarını tutan dosyanın yolu
+
+def kitaplari_yukle() -> List[Kitap]:#kitap bilgilerini json dosyasından yükler ve kitap nesneleri listesi döndürür
+    if not os.path.exists(KITAP_DOSYA):
+        return []
+    with open(KITAP_DOSYA, "r", encoding="utf-8") as f:
+        return [Kitap(**k) for k in json.load(f)]
+
+def oduncleri_yukle() -> List[OduncKaydi]:#ödünç kayıtlarını json dosyasından yükler ve ödünç kaydı nesneleri listesi döndürür
+    if not os.path.exists(ODUNC_DOSYA):
+        return []
+    with open(ODUNC_DOSYA, "r", encoding="utf-8") as f:
+        return [OduncKaydi(**o) for o in json.load(f)]
+def envanter_ozeti():
+    """Toplam kitap, stok, sıfır stoklu kitaplar"""
+    print("\n📚 ENVANTER ÖZETİ")
+    print("-" * 40)
+    kitaplar = kitaplari_yukle()
+
+    if not kitaplar:
+        print("Henüz kitap yok.")
+        return
+
+    toplam_tur  = len(kitaplar)
+    toplam_stok = sum(k.stok for k in kitaplar)
+    sifir_stok  = [k for k in kitaplar if k.stok == 0]
+
+    print(f"Toplam kitap türü : {toplam_tur}")
+    print(f"Toplam stok       : {toplam_stok}")
+    print(f"Stokta olmayan    : {len(sifir_stok)}")
+
+    if sifir_stok:
+        print("\nStokta kalmayan kitaplar:")
+        for k in sifir_stok:
+            print(f"  - {k.ad} ({k.isbn})")
+
+def populer_kitaplar():
+    """En çok ödünç alınan 5 kitap"""
+    print("\n🏆 EN POPÜLER KİTAPLAR")
+    print("-" * 40)
+    oduncler = oduncleri_yukle()
+    kitaplar = kitaplari_yukle()
+
+    if not oduncler:
+        print("Henüz ödünç kaydı yok.")
+        return
+
+    # Her isbn'in kaç kez ödünç alındığını say
+    sayac = Counter(o.isbn for o in oduncler)
+
+    print(f"{'Sıra':<5} {'Kitap Adı':<30} {'Ödünç Sayısı'}")
+    print("-" * 50)
+    for sira, (isbn, adet) in enumerate(sayac.most_common(5), 1):
+        kitap = next((k for k in kitaplar if k.isbn == isbn), None)
+        ad = kitap.ad if kitap else isbn
+        print(f"{sira:<5} {ad[:29]:<30} {adet}")
+
+def gecikmis_iadeler():
+    """Süresi geçmiş ödünç kayıtları"""
+    print("\n⚠ GECİKMİŞ İADELER")
+    print("-" * 40)
+    oduncler = oduncleri_yukle()
+    kitaplar = kitaplari_yukle()
+    bugun = datetime.date.today()
+
+    # İade edilmemiş ve süresi geçmiş olanlar
+    gecikmisler = []
+    for o in oduncler:
+        if o.geri_donus_tarihi:  # zaten iade edilmiş
+            continue
+        iade = datetime.date.fromisoformat(o.iade_tarihi)
+        if bugun > iade:
+            gecikme_gun = (bugun - iade).days
+            gecikmisler.append((o, gecikme_gun))
+
+    if not gecikmisler:
+        print("✓ Gecikmiş iade yok!")
+        return
+
+    print(f"{'Kullanıcı':<20} {'Kitap':<25} {'Gecikme'}")
+    print("-" * 55)
+    for o, gun in gecikmisler:
+        kitap = next((k for k in kitaplar if k.isbn == o.isbn), None)
+        ad = kitap.ad[:24] if kitap else o.isbn
+        print(f"{o.kullanici_adi:<20} {ad:<25} {gun} gün")
+
+def tam_rapor():
+    """Tüm raporları bir arada göster"""
+    print("\n" + "=" * 50)
+    print("       KÜTÜPHANE İSTATİSTİK RAPORU")
+    print("=" * 50)
+    envanter_ozeti()
+    populer_kitaplar()
+    gecikmis_iadeler()
+    print("\n" + "=" * 50)
