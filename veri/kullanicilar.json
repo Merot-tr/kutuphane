@@ -12,5 +12,12 @@
     "rol": "ogrenci",
     "ad_soyad": "naznaz",
     "ogrenci_no": "345"
+  },
+  {
+    "kullanici_adi": "Ayına",
+    "sifre_hash": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
+    "rol": "yonetici",
+    "ad_soyad": "naz",
+    "ogrenci_no": ""
   }
 ]

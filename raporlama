@@ -120,3 +120,24 @@ def tam_rapor():
     populer_kitaplar()
     gecikmis_iadeler()
     print("\n" + "=" * 50)
+    if __name__ == "__main__":
+    while True:
+        print("\n1. Envanter Özeti")
+        print("2. Popüler Kitaplar")
+        print("3. Gecikmiş İadeler")
+        print("4. Tam Rapor")
+        print("0. Çıkış")
+        secim = input("Seçim: ").strip()
+
+        if secim == "1":
+            envanter_ozeti()
+        elif secim == "2":
+            populer_kitaplar()
+        elif secim == "3":
+            gecikmis_iadeler()
+        elif secim == "4":
+            tam_rapor()
+        elif secim == "0":
+            break
+        else:
+            print("Geçersiz seçim.")
