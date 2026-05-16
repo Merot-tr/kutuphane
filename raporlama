@@ -120,8 +120,8 @@ def tam_rapor():
     populer_kitaplar()
     gecikmis_iadeler()
     print("\n" + "=" * 50)
-    if __name__ == "__main__":
-     while True:
+if __name__ == "__main__":
+    while True:
         print("\n1. Envanter Özeti")
         print("2. Popüler Kitaplar")
         print("3. Gecikmiş İadeler")

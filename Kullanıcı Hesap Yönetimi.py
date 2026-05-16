@@ -81,6 +81,19 @@ def kullanici_sil(aktif_kullanici):
 
     kullanicilari_kaydet(yeni_liste)
     print(f"✓ '{k_adi}' silindi.")
+#Kullanıcıları listeleme fonksiyonu
+def kullanicilari_listele():
+    print("\n--- Kullanıcı Listesi ---")
+    kullanicilar = kullanicilari_yukle()
+
+    if not kullanicilar:
+        print("Henüz kullanıcı yok.")
+        return
+
+    print(f"\n{'Kullanıcı Adı':<20} {'Ad Soyad':<25} {'Rol':<12} {'Öğrenci No'}")
+    print("-" * 65)
+    for u in kullanicilar:
+        print(f"{u.kullanici_adi:<20} {u.ad_soyad:<25} {u.rol:<12} {u.ogrenci_no}")
 if __name__ == "__main__":
     os.makedirs("veri", exist_ok=True)
 
