@@ -10,8 +10,6 @@ class Kitap:
     isbn: str
     ad: str
     yazar: str
-    yayinevi: str
-    yayin_yili: int
     stok: int
     konum: str
 

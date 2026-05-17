@@ -8,8 +8,6 @@ class Kitap:
     isbn: str
     ad: str
     yazar: str
-    yayinevi: str
-    yayin_yili: int
     stok: int
     konum: str
 
@@ -27,7 +25,6 @@ def kitap_ara():
     print("1. Ada göre ara")
     print("2. Yazara göre ara")
     print("3. ISBN'ye göre ara")
-    print("4. Yayınevine göre ara")
     secim = input("Seçim: ").strip()
 
     aranan = input("Aranacak kelime: ").strip().lower()#aranacak kelimeyi küçük harfe çevirir
@@ -41,8 +38,6 @@ def kitap_ara():
         sonuclar = [k for k in kitaplar if aranan in k.yazar.lower()]
     elif secim == "3":
         sonuclar = [k for k in kitaplar if aranan in k.isbn.lower()]
-    elif secim == "4":
-        sonuclar = [k for k in kitaplar if aranan in k.yayinevi.lower()]
     else:
         print("Geçersiz seçim.")
         return

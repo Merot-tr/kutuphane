@@ -109,8 +109,48 @@ class KutuphaneArayuz:
 
     def kitap_ekle_penceresi(self):
         """Yeni kitap eklemek için form penceresi açar"""
-        # Bu kısmı da yukarıdaki mantıkla Entry'ler koyup butonun 'command' kısmına 
-        # kg.kitap_ekle() fonksiyonundaki mantığı tkinter entegreli yazarak geliştirebilirsin.
+        yeni_pencere = tk.Toplevel(self.root)
+        yeni_pencere.title("Yeni Kitap Ekle")
+        yeni_pencere.geometry("400x400")
+        tk.Label(yeni_pencere, text="Yeni Kitap Bilgileri", font=("Arial", 14, "bold")).pack(pady=20)
+        tk.Label(yeni_pencere, text="ISBN:").pack(pady=5)
+        ent_isbn = tk.Entry(yeni_pencere)
+        ent_isbn.pack()
+        tk.Label(yeni_pencere, text="Kitap Adı:").pack(pady=5)
+        ent_ad = tk.Entry(yeni_pencere)
+        ent_ad.pack()
+        tk.Label(yeni_pencere, text="Yazar:").pack(pady=5)
+        ent_yazar = tk.Entry(yeni_pencere)
+        ent_yazar.pack()
+        tk.Label(yeni_pencere, text="Stok:").pack(pady=5)
+        ent_stok = tk.Entry(yeni_pencere)
+        ent_stok.pack()
+        tk.Label(yeni_pencere, text="Konum:").pack(pady=5)
+        ent_konum = tk.Entry(yeni_pencere)
+        ent_konum.pack()
+
+        def kaydet():
+            isbn = ent_isbn.get().strip()
+            ad = ent_ad.get().strip()
+            yazar = ent_yazar.get().strip()
+            stok = ent_stok.get().strip()
+            konum = ent_konum.get().strip()
+            try:
+                # Eğer kg.kitap_ekle mevcutsa kullan, yoksa sadece bilgilendir
+                if hasattr(kg, 'kitap_ekle') and kg.kitap_ekle(isbn, ad, yazar, int(stok) if stok else 0, konum):
+                    messagebox.showinfo("Başarılı", "Kitap eklendi.")
+                    yeni_pencere.destroy()
+            except Exception as e:
+                messagebox.showerror("Hata", str(e))
+
+        tk.Button(yeni_pencere, text="Kaydet", command=kaydet, bg="green", fg="white").pack(pady=10)
+        
+        
+    def stok_guncelle_penceresi(self):
+        """Stok güncelleme işlemi için form penceresi açar"""
+        pass
+    def kullanici_yonetimi_penceresi(self):
+        """Kullanıcı yönetimi penceresi (placeholder)"""
         pass
 
 if __name__ == "__main__":

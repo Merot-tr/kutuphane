@@ -3,8 +3,6 @@
     "isbn": "978001",
     "ad": "Nutuk",
     "yazar": "Mustafa Kemal Atatürk",
-    "yayinevi": "Milli Eğitim",
-    "yayin_yili": 1927,
     "stok": 5,
     "konum": "A-1"
   },
@@ -12,8 +10,6 @@
     "isbn": "978002",
     "ad": "1984",
     "yazar": "George Orwell",
-    "yayinevi": "Can Yayınları",
-    "yayin_yili": 1949,
     "stok": 2,
     "konum": "B-2"
   },
@@ -21,8 +17,6 @@
     "isbn": "978003",
     "ad": "Küçük Prens",
     "yazar": "Antoine de Saint-Exupéry",
-    "yayinevi": "Mavi Bulut",
-    "yayin_yili": 1943,
     "stok": 10,
     "konum": "C-1"
   },
@@ -30,8 +24,6 @@
     "isbn": "978004",
     "ad": "Harry Potter ve Felsefe Taşı",
     "yazar": "J.K. Rowling",
-    "yayinevi": "YKY",
-    "yayin_yili": 1997,
     "stok": 4,
     "konum": "D-4"
   },
@@ -39,8 +31,6 @@
     "isbn": "978005",
     "ad": "Simyacı",
     "yazar": "Paulo Coelho",
-    "yayinevi": "Can Yayınları",
-    "yayin_yili": 1988,
     "stok": 7,
     "konum": "A-3"
   },
@@ -48,9 +38,35 @@
     "isbn": "00101",
     "ad": "Deneme",
     "yazar": "Deneme",
-    "yayinevi": "Deneme",
-    "yayin_yili": 212,
     "stok": 2,
     "konum": "a2"
+  },
+  {
+    "isbn": "1",
+    "ad": "1",
+    "yazar": "1",
+    "stok": 1,
+    "konum": "1"
+  },
+  {
+    "isbn": "3",
+    "ad": "3",
+    "yazar": "3",
+    "stok": 3,
+    "konum": "3"
+  },
+  {
+    "isbn": "2",
+    "ad": "2",
+    "yazar": "2",
+    "stok": 3,
+    "konum": "2"
+  },
+  {
+    "isbn": "4",
+    "ad": "4",
+    "yazar": "4",
+    "stok": 4,
+    "konum": "4"
   }
 ]

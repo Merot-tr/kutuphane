@@ -1,15 +1,14 @@
 import json #Kitap listeni bir metin dosyasına yazar, programı tekrar açtığında oradan geri okur
 import os#Bilgisayardaki dosyalarla ilgili işlemler yapmamızı sağlar
 from dataclasses import dataclass, asdict
+from tkinter import messagebox
 from typing import List#Sadece liste değil kitap listeleri olduğunu belirtmek için kullanılır
 
 @dataclass
 class Kitap:#Kitap Bilgilerini tutan sınıf
     isbn: str           #Kitap numarası tc gibi benzersiz olmalı
     ad: str            
-    yazar: str         
-    yayinevi: str        
-    yayin_yili: int      
+    yazar: str              
     stok: int           
     konum: str          
 #Dosya işlemleri
@@ -26,43 +25,33 @@ def kitaplari_kaydet(liste: List[Kitap]):
     with open(DOSYA, "w", encoding="utf-8") as f:
         json.dump([asdict(k) for k in liste], f,
                   ensure_ascii=False, indent=2)#Kitap nesnelerini sözlük formatına çevirir ve json dosyasına yazar// Veriyi 2 boşluk girintili yazar
-def kitap_ekle():
+def kitap_ekle(isbn, ad, yazar, stok, konum):
     """Yeni kitap ekler. Aynı ISBN varsa reddeder."""
-    print("\n--- Yeni Kitap Ekle ---")
     kitaplar = kitaplari_yukle()
 
-    isbn = input("ISBN          : ").strip()
     for k in kitaplar:
         if k.isbn == isbn:
-            print("✗ Bu ISBN zaten kayıtlı!")
-            return
+            messagebox.showerror("Hata", "Bu ISBN zaten kayıtlı.")
+            return 0
 
-    ad        = input("Kitap Adı     : ").strip()
-    yazar     = input("Yazar         : ").strip()
-    yayinevi  = input("Yayınevi      : ").strip()
 
     while True:
         try:
-            yil = int(input("Yayın Yılı    : ").strip())
-            break
-        except ValueError:
-            print("  Lütfen geçerli bir yıl girin.")
-
-    while True:
-        try:
-            stok = int(input("Stok Adedi    : ").strip())
+            stok = int(stok)
             if stok >= 0:
                 break
-            print("  Stok negatif olamaz.")
+            messagebox.showerror("Hata", "Stok negatif olamaz.")
+            return 0
         except ValueError:
-            print("  Lütfen geçerli bir sayı girin.")
+           messagebox.showerror("Hata", "Stok miktarı geçerli bir sayı olmalıdır.")
+           return 0
+    
 
-    konum = input("Konum (raf)   : ").strip()
 
-    yeni = Kitap(isbn, ad, yazar, yayinevi, yil, stok, konum)
+    yeni = Kitap(isbn, ad, yazar, stok, konum)
     kitaplar.append(yeni)
     kitaplari_kaydet(kitaplar)
-    print(f"✓ '{ad}' kitabı başarıyla eklendi.")
+    messagebox.showinfo("Bilgi", f"'{ad}' kitabı başarıyla eklendi.")
 
 
 def stok_guncelle():
