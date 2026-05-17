@@ -54,27 +54,27 @@ def kitap_ekle(isbn, ad, yazar, stok, konum):
     messagebox.showinfo("Bilgi", f"'{ad}' kitabı başarıyla eklendi.")
 
 
-def stok_guncelle():
+def stok_guncelle(isbn,yeni_stok):
     """Mevcut bir kitabın stok miktarını günceller."""
-    print("\n--- Stok Güncelle ---")
-    isbn = input("Güncellenecek kitabın ISBN'i: ").strip()
     kitaplar = kitaplari_yukle()
 
     for k in kitaplar:
         if k.isbn == isbn:
-            print(f"  Kitap      : {k.ad}")
-            print(f"  Mevcut stok: {k.stok}")
+            messagebox.showinfo("Bilgi", f"  Kitap      : {k.ad}")
+            messagebox.showinfo("Bilgi", f"  Mevcut stok: {k.stok}")
             while True:
                 try:
-                    yeni_stok = int(input("Yeni stok: ").strip())
+                    yeni_stok = int(yeni_stok)
                     if yeni_stok >= 0:
                         break
-                    print("  Stok negatif olamaz.")
+                    messagebox.showerror("Hata", "Stok negatif olamaz.")
+                    return 0
                 except ValueError:
-                    print("  Lütfen geçerli bir sayı girin.")
+                    messagebox.showerror("Hata", "Lütfen geçerli bir sayı girin.")
+                    return 0
             k.stok = yeni_stok
             kitaplari_kaydet(kitaplar)
-            print(f"✓ Stok güncellendi → {yeni_stok}")
+            messagebox.showinfo("Bilgi", f"✓ Stok güncellendi → {yeni_stok}")
             return
 
-    print("✗ Kitap bulunamadı.")
+    messagebox.showerror("Hata", "✗ Kitap bulunamadı.")

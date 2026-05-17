@@ -5,7 +5,9 @@ from kullanici_girisi_ve_yetkilendirme import (
     kullanicilari_kaydet,
     sifrele,
 )
-def kullanici_olustur():
+from tkinter import messagebox
+import json
+def kullanici_olustur(ad, soyad, k_adi, sifre, rol, ogr_no=""):
     print("\n--- Kullanıcı Oluştur ---")
     kullanicilar = kullanicilari_yukle()
 
@@ -14,7 +16,7 @@ def kullanici_olustur():
     # Aynı kullanıcı adı var mı?
     for u in kullanicilar:
         if u.kullanici_adi == k_adi:
-            print("✗ Bu kullanıcı adı zaten alınmış!")#kullanıcı adı zaten varsa hata mesajı verir ve fonksiyondan çıkar
+            messagebox.showerror("Hata", "Bu kullanıcı adı zaten alınmış!")
             return
 
     sifre    = input("Şifre         : ").strip()
