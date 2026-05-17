@@ -14,6 +14,8 @@ class KutuphaneArayuz:
         self.root.title("Kütüphane Yönetim Sistemi")
         self.root.geometry("400x350")
         self.root.config(background="brown")
+        self.root.attributes("-fullscreen", True)  # Tam ekran modunu etkinleştir
+        self.root.bind("<Escape>", lambda event: self.root.attributes("-fullscreen", False))
         self.aktif_kullanici = None
         
         # Pencere kapatıldığında arka planda terminalin asılı kalmaması için
@@ -35,21 +37,45 @@ class KutuphaneArayuz:
 
     def giris_ekrani_hazirla(self):
         self.temizle()
-        self.root.geometry("400x350")
+        # Pencereyi tam ekran yapıyoruz
+        self.root.state("zoomed") 
         self.root.config(background="brown")
         
-        tk.Label(self.root, text="KÜTÜPHANE SİSTEMİ GİRİŞİ", font=("Arial", 14, "bold"), bg="brown", fg="white").pack(pady=20)
+        # 1. SIHİRLİ ADIM: Tüm ekranı kaplayan ama içeriği ORTADA tutan bir ana taşıyıcı Frame
+        # expand=True ve fill=tk.BOTH satırları bu çerçevenin ekranın tam ortasına kilitlenmesini sağlar.
+        merkez_pencerem = tk.Frame(self.root, bg="brown")
+        merkez_pencerem.pack(expand=True, fill=tk.BOTH)
         
-        tk.Label(self.root, text="Kullanıcı Adı:", bg="brown", fg="white", font=("Arial", 10, "bold")).pack(pady=5)
-        self.ent_kadi = tk.Entry(self.root, font=("Arial", 10))
-        self.ent_kadi.pack()
-        
-        tk.Label(self.root, text="Şifre:", bg="brown", fg="white", font=("Arial", 10, "bold")).pack(pady=5)
-        self.ent_sifre = tk.Entry(self.root, show="*", font=("Arial", 10))
-        self.ent_sifre.pack()
-        
-        tk.Button(self.root, text="Giriş Yap", command=self.giris_kontrol, bg="green", fg="white", font=("Arial", 10, "bold"), width=15).pack(pady=25)
+        # İçerideki elemanların dikeyde de ortalanması için üst tarafa esnek bir boşluk bırakıyoruz
+        merkez_pencerem.grid_rowconfigure(0, weight=1)
+        merkez_pencerem.grid_rowconfigure(6, weight=1)
+        merkez_pencerem.grid_columnconfigure(0, weight=1)
 
+        # 2. ADIM: Elemanları grid mimarisiyle alt alta ve tam ortalanmış (anchor="center") olarak diziyoruz.
+        
+        # Ana Başlık
+        lbl_baslik = tk.Label(merkez_pencerem, text="KÜTÜPHANE SİSTEMİ GİRİŞİ", font=("Arial", 28, "bold"), bg="brown", fg="white")
+        lbl_baslik.grid(row=1, column=0, pady=(0, 40), sticky="n")
+        
+        # Kullanıcı Adı Etiketi
+        lbl_kadi = tk.Label(merkez_pencerem, text="Kullanıcı Adı", bg="brown", fg="white", font=("Arial", 16, "bold"))
+        lbl_kadi.grid(row=2, column=0, pady=5)
+        
+        # Kullanıcı Adı Giriş Kutusu
+        self.ent_kadi = tk.Entry(merkez_pencerem, font=("Arial", 18), width=30, justify=tk.CENTER)
+        self.ent_kadi.grid(row=3, column=0, pady=10)
+        
+        # Şifre Etiketi
+        lbl_sifre = tk.Label(merkez_pencerem, text="Şifre", bg="brown", fg="white", font=("Arial", 16, "bold"))
+        lbl_sifre.grid(row=4, column=0, pady=5)
+        
+        # Şifre Giriş Kutusu (Yazılan şifreler de kutunun ortasından başlasın diye justify=tk.CENTER eklendi)
+        self.ent_sifre = tk.Entry(merkez_pencerem, show="*", font=("Arial", 18), width=30, justify=tk.CENTER)
+        self.ent_sifre.grid(row=5, column=0, pady=10)
+        
+        # Giriş Butonu
+        btn_giris = tk.Button(merkez_pencerem, text="Giriş Yap", command=self.giris_kontrol, bg="green", fg="white", font=("Arial", 16, "bold"), width=18)
+        btn_giris.grid(row=6, column=0, pady=40, ipady=8)
     def giris_kontrol(self):
         k_adi = self.ent_kadi.get().strip()
         sifre = self.ent_sifre.get().strip()
