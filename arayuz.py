@@ -450,21 +450,22 @@ class KutuphaneArayuz:
     def raporlama_penceresi(self):
         yeni_pencere = tk.Toplevel(self.root)
         yeni_pencere.title("İstatistik ve Raporlama")
-        yeni_pencere.geometry("500x400")
+        yeni_pencere.geometry("500x450") # Buton sığsın diye boyutu azıcık büyüttük
 
         txt_rapor = tk.Text(yeni_pencere, wrap=tk.WORD, font=("Courier", 10))
         txt_rapor.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
         def rapor_getir(tip):
-            txt_rapor.delete("1.0", tk.END)
+            txt_rapor.delete("1.0", tk.END) # Ekranı temizle
             kitaplar = kg.kitaplari_yukle()
             oduncler = oa.oduncleri_yukle()
             import datetime
             
+            # --- MEVCUT TİPLER ---
             if tip == "envanter":
                 toplam_kitap = len(kitaplar)
                 toplam_stok = sum(k.stok for k in kitaplar)
-                txt_rapor.insert(tk.END, f"--- ENVANTER ÖZETİ ---\n\nToplam Benzersiz Kitap Sorumluluğu: {toplam_kitap}\nDepolardaki Toplam Kitap Adedi: {toplam_stok}\n")
+                txt_rapor.insert(tk.END, f"--- ENVANTER ÖZETİ ---\n\nToplam Kitap Çeşitleri: {toplam_kitap}\nDepolardaki Toplam Kitap Adedi: {toplam_stok}\n")
             
             elif tip == "populer":
                 from collections import Counter
@@ -490,13 +491,30 @@ class KutuphaneArayuz:
                         say += 1
                 if say == 0: txt_rapor.insert(tk.END, "Gecikmiş ödünç kaydı bulunmuyor.")
 
+            # 🌟 YENİ EKLEDİĞİMİZ TİP (Burayı istediğin gibi değiştirebilirsin) 🌟
+            elif tip == "kritik":
+                txt_rapor.insert(tk.END, "--- STOKTA KALMAYAN / KRİTİK KİTAPLAR ---\n\n")
+                kritik_kitaplar = [k for k in kitaplar if k.stok == 0]
+                
+                if not kritik_kitaplar:
+                    txt_rapor.insert(tk.END, "Harika! Stokta bulunmayan hiçbir kitap yok.")
+                else:
+                    for k in kritik_kitaplar:
+                        txt_rapor.insert(tk.END, f"❌ ISBN: {k.isbn} | {k.ad} - Yazar: {k.yazar} (STOK TÜKENDİ!)\n")
+
+        # ── BUTONLARIN YERLEŞTİRİLDİĞİ ALT BÖLÜM ──
         bf = tk.Frame(yeni_pencere)
         bf.pack(pady=5)
-        tk.Button(bf, text="Envanter", command=lambda: rapor_getir("envanter"), width=12).grid(row=0, column=0, padx=5)
-        tk.Button(bf, text="Popülerler", command=lambda: rapor_getir("populer"), width=12).grid(row=0, column=1, padx=5)
-        tk.Button(bf, text="Gecikenler", command=lambda: rapor_getir("gecikme"), width=12).grid(row=0, column=2, padx=5)
+        
+        # Mevcut Butonlar
+        tk.Button(bf, text="Envanter", command=lambda: rapor_getir("envanter"), width=10).grid(row=0, column=0, padx=2)
+        tk.Button(bf, text="Popülerler", command=lambda: rapor_getir("populer"), width=10).grid(row=0, column=1, padx=2)
+        tk.Button(bf, text="Gecikenler", command=lambda: rapor_getir("gecikme"), width=10).grid(row=0, column=2, padx=2)
+        
+        # 🌟 Yeni Eklediğimiz Tip İçin Buton (Kritik) 🌟
+        tk.Button(bf, text="Kritik Stok", command=lambda: rapor_getir("kritik"), width=10, bg="#ffcccb").grid(row=0, column=3, padx=2)
 
-        rapor_getir("envanter") # Varsayılan olarak envanteri göster
+        rapor_getir("envanter") # Pencere ilk açıldığında ekrana gelecek varsayılan tip
 
 if __name__ == "__main__":
     kgy.sistem_hazirla()
